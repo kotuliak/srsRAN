@@ -831,9 +831,11 @@ int rf_soapy_recv_with_time_multi(void*    h,
         handler->device, handler->rxStream, buffs_ptr, rx_samples, &flags, &timeNs, timeoutUs);
     if (ret == SOAPY_SDR_OVERFLOW || (ret > 0 && (flags & SOAPY_SDR_END_ABRUPT) != 0)) {
       log_overflow(handler);
+      trials++;
       continue;
     } else if (ret == SOAPY_SDR_TIMEOUT) {
       log_late(handler, true);
+      trials++;
       continue;
     } else if (ret < 0) {
       // unspecific error
