@@ -791,7 +791,11 @@ double rf_soapy_set_tx_freq(void* h, uint32_t ch, double freq)
 
 void rf_soapy_get_time(void* h, time_t* secs, double* frac_secs)
 {
-  printf("Todo: implement rf_soapy_get_time()\n");
+  // printf("Todo: implement rf_soapy_get_time()\n");
+  rf_soapy_handler_t* handler = (rf_soapy_handler_t*)h;
+  long long timeNs = SoapySDRDevice_getHardwareTime(handler->device, "");
+  *secs      = floor(timeNs / 1e9);
+  *frac_secs = (timeNs % 1000000000) / 1e9;
 }
 
 // TODO: add multi-channel support
