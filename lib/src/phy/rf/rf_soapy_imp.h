@@ -39,6 +39,8 @@ SRSRAN_API int rf_soapy_close(void* h);
 
 SRSRAN_API int rf_soapy_start_rx_stream(void* h, bool now);
 
+SRSRAN_API int rf_soapy_start_tx_stream(void* h);
+
 SRSRAN_API int rf_soapy_stop_rx_stream(void* h);
 
 SRSRAN_API void rf_soapy_calibrate_tx(void* h);
