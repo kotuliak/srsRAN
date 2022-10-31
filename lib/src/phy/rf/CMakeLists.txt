@@ -54,10 +54,10 @@ if(RF_FOUND)
     list(APPEND SOURCES_RF rf_blade_imp.c)
   endif (BLADERF_FOUND)
 
-  if (SOAPYSDR_FOUND AND ENABLE_SOAPYSDR)
-    add_definitions(-DENABLE_SOAPYSDR)
+  # if (SOAPYSDR_FOUND AND ENABLE_SOAPYSDR)
+  #   add_definitions(-DENABLE_SOAPYSDR)
     list(APPEND SOURCES_RF rf_soapy_imp.c)
-  endif (SOAPYSDR_FOUND AND ENABLE_SOAPYSDR)
+  # endif (SOAPYSDR_FOUND AND ENABLE_SOAPYSDR)
 
   if(SKIQ_FOUND)
     add_executable(skiq_pps_test skiq_pps_test.c)
