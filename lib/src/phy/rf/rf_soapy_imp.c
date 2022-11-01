@@ -798,6 +798,15 @@ void rf_soapy_get_time(void* h, time_t* secs, double* frac_secs)
   *frac_secs = (timeNs % 1000000000) / 1e9;
 }
 
+void rf_soapy_get_tx_time(void* h, time_t* secs, double* frac_secs)
+{
+  // printf("Todo: implement rf_soapy_get_time()\n");
+  rf_soapy_handler_t* handler = (rf_soapy_handler_t*)h;
+  long long timeNs = SoapySDRDevice_getHardwareTime(handler->device, "TX");
+  *secs      = floor(timeNs / 1e9);
+  *frac_secs = (timeNs % 1000000000) / 1e9;
+}
+
 // TODO: add multi-channel support
 int rf_soapy_recv_with_time_multi(void*    h,
                                   void*    data[SRSRAN_MAX_PORTS],

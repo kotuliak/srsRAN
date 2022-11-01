@@ -91,6 +91,8 @@ SRSRAN_API double rf_soapy_set_tx_freq(void* h, uint32_t ch, double freq);
 
 SRSRAN_API void rf_soapy_get_time(void* h, time_t* secs, double* frac_secs);
 
+SRSRAN_API void rf_soapy_get_tx_time(void* h, time_t* secs, double* frac_secs);
+
 SRSRAN_API int rf_soapy_send_timed(void*  h,
                                    void*  data,
                                    int    nsamples,
