@@ -398,10 +398,10 @@ static void timestamp_to_secs(uint32_t rate, uint64_t timestamp, time_t* secs, d
   time_t secs_i    = (time_t)totalsecs;
   if (secs) {
     *secs = secs_i;
-  }
-  if (frac_secs) {
-    *frac_secs = totalsecs - secs_i;
-  }
+    if (frac_secs) {
+      *frac_secs = totalsecs - secs_i;
+    }
+  } 
 }
 
 void rf_blade_get_time(void* h, time_t* secs, double* frac_secs)
