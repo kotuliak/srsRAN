@@ -633,7 +633,7 @@ static int uhd_init(rf_uhd_handler_t* handler, char* args, uint32_t nof_channels
 
   // Select same synchronization source only if more than one channel is opened
   std::string sync_src = "internal";
-  if (nof_channels > 1) {
+  if (nof_channels > 1 || clock_src == "gpsdo") {
     sync_src = clock_src;
   }
 
