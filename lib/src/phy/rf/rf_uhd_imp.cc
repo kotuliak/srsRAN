@@ -636,6 +636,10 @@ static int uhd_init(rf_uhd_handler_t* handler, char* args, uint32_t nof_channels
   if (nof_channels > 1 || clock_src == "gpsdo") {
     sync_src = clock_src;
   }
+  if (device_addr.has_key("sync")) {
+    sync_src = device_addr.pop("sync");
+  }
+  
 
   // Logging level
 #ifdef UHD_LOG_INFO
@@ -845,7 +849,8 @@ static int uhd_init(rf_uhd_handler_t* handler, char* args, uint32_t nof_channels
   }
 
   // Reset timestamps
-  if (nof_channels > 1 and clock_src != "gpsdo") {
+  if ((nof_channels > 1 and clock_src != "gpsdo") || sync_src == "external") {
+    printf("sync is here\n");
     handler->uhd->set_time_unknown_pps(uhd::time_spec_t());
   }
 
