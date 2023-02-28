@@ -851,7 +851,9 @@ static int uhd_init(rf_uhd_handler_t* handler, char* args, uint32_t nof_channels
   // Reset timestamps
   // if ((nof_channels > 1 and clock_src != "gpsdo") || sync_src == "external") {
   //   printf("sync is here\n");
-  handler->uhd->set_time_unknown_pps(uhd::time_spec_t());
+  if (clock_src != "gpsdo") {
+    handler->uhd->set_time_unknown_pps(uhd::time_spec_t());
+  }
   // }
 
   if (handler->uhd->get_rx_stream(handler->rx_nof_samples) != UHD_ERROR_NONE) {
