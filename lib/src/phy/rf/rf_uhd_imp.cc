@@ -150,6 +150,7 @@ struct rf_uhd_handler_t {
   uint32_t                                nof_tx_channels     = 0;
   std::array<double, SRSRAN_MAX_CHANNELS> tx_freq             = {};
   std::array<double, SRSRAN_MAX_CHANNELS> rx_freq             = {};
+  std::string                             clock_src           = "";
 
   std::mutex                                                 tx_gain_mutex;
   std::array<std::pair<double, double>, SRSRAN_MAX_CHANNELS> tx_gain_db = {};
@@ -626,15 +627,15 @@ static int uhd_init(rf_uhd_handler_t* handler, char* args, uint32_t nof_channels
   handler->uhd_error_handler = nullptr;
 
   // Check external clock argument
-  std::string clock_src = "internal";
+  handler->clock_src = "internal";
   if (device_addr.has_key("clock")) {
-    clock_src = device_addr.pop("clock");
+    handler->clock_src = device_addr.pop("clock");
   }
 
   // Select same synchronization source only if more than one channel is opened
   std::string sync_src = "internal";
-  if (nof_channels > 1 || clock_src == "gpsdo") {
-    sync_src = clock_src;
+  if (nof_channels > 1 || handler->clock_src == "gpsdo") {
+    sync_src = handler->clock_src;
   }
   if (device_addr.has_key("sync")) {
     sync_src = device_addr.pop("sync");
@@ -815,11 +816,11 @@ static int uhd_init(rf_uhd_handler_t* handler, char* args, uint32_t nof_channels
   std::string sensor_name;
 
   // Set sync source
-  if (handler->uhd->set_sync_source(sync_src, clock_src) != UHD_ERROR_NONE) {
+  if (handler->uhd->set_sync_source(sync_src, handler->clock_src) != UHD_ERROR_NONE) {
     return SRSRAN_ERROR;
   }
 
-  if (clock_src == "gpsdo") {
+  if (handler->clock_src == "gpsdo") {
     set_time_to_gps_time(handler);
     sensor_name = "gps_locked";
   } else {
@@ -827,7 +828,7 @@ static int uhd_init(rf_uhd_handler_t* handler, char* args, uint32_t nof_channels
   }
 
   // Wait until external reference / GPS is locked
-  if (clock_src != "internal") {
+  if (handler->clock_src != "internal") {
     // blocks until clock source is locked
     int error = wait_sensor_locked(handler, sensor_name, true, 300, is_locked);
     // Print Not lock error if the return was succesful, wait_sensor_locked prints the error before returning
@@ -851,10 +852,9 @@ static int uhd_init(rf_uhd_handler_t* handler, char* args, uint32_t nof_channels
   // Reset timestamps
   // if ((nof_channels > 1 and clock_src != "gpsdo") || sync_src == "external") {
   //   printf("sync is here\n");
-  if (clock_src != "gpsdo") {
+  if (handler->clock_src != "gpsdo") {
     handler->uhd->set_time_unknown_pps(uhd::time_spec_t());
   }
-  // }
 
   if (handler->uhd->get_rx_stream(handler->rx_nof_samples) != UHD_ERROR_NONE) {
     return SRSRAN_ERROR;
@@ -967,6 +967,9 @@ static inline void rf_uhd_set_master_clock_rate_nolock(rf_uhd_handler_t* handler
   if (handler->dynamic_master_rate and handler->current_master_clock != rate) {
     handler->uhd->set_master_clock_rate(rate);
     handler->current_master_clock = rate;
+    if (handler->clock_src == "gpsdo") {
+      set_time_to_gps_time(handler);
+    }
   }
 }
 
