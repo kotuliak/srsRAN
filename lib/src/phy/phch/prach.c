@@ -702,7 +702,7 @@ int srsran_prach_set_cell_(srsran_prach_t*      p,
     // Generate our 64 sequences
     p->N_roots = 0;
     srsran_prach_gen_seqs(p);
-    printf("Using %d root sequences in this configuration\n");
+    printf("Using %d root sequences in this configuration\n", p->N_roots);
     // Ensure num_ra_preambles is valid, if not assign default value
     if (p->num_ra_preambles < 4 || p->num_ra_preambles > p->N_roots) {
       p->num_ra_preambles = p->N_roots;
