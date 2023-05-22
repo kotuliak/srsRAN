@@ -79,6 +79,7 @@ typedef struct SRSRAN_API {
   float    T_seq; // Preamble length in seconds
   float    T_tot; // Total sequence length in seconds
   uint32_t N_cp;  // Cyclic prefix length
+  uint32_t N_start_off;
   uint32_t delta_f;
   uint32_t delta_f_ra;
 
