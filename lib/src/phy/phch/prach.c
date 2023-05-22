@@ -1015,7 +1015,13 @@ int srsran_prach_detect_offset(srsran_prach_t* p,
     uint32_t N_rb_ul = srsran_nof_prb(p->N_ifft_ul);
     uint32_t k_0     = freq_offset * N_RB_SC - N_rb_ul * N_RB_SC / 2 + p->N_ifft_ul / 2;
     uint32_t K       = p->delta_f / p->delta_f_ra;
-    uint32_t begin   = PHI + (K * k_0) + (p->is_nr ? 0 : (K / 2));
+    uint32_t begin;
+    if (p->is_nr) {
+      begin = 2 + (K * k_0) + (p->is_nr ? 0 : (K / 2));
+    } else {
+      begin = PHI + (K * k_0) + (p->is_nr ? 0 : (K / 2));
+    }
+    
 
     memcpy(p->prach_bins, &p->signal_fft[begin], p->N_zc * sizeof(cf_t));
     int loops = (p->successive_cancellation) ? SUCCESSIVE_CANCELLATION_ITS : 1;
