@@ -735,10 +735,18 @@ int srsran_prach_set_cell_(srsran_prach_t*      p,
       return -1;
     }
 
-    p->N_seq = prach_Tseq[p->f] * p->N_ifft_ul / 2048;
-    p->N_cp  = prach_Tcp[p->f] * p->N_ifft_ul / 2048;
-    p->T_seq = prach_Tseq[p->f] * SRSRAN_LTE_TS;
-    p->T_tot = (prach_Tseq[p->f] + prach_Tcp[p->f]) * SRSRAN_LTE_TS;
+    if (p->is_nr) {
+      p->N_seq = 12*2048 * p->N_ifft_ul / 2048;
+      p->N_cp  = 936 * p->N_ifft_ul / 2048;
+      p->T_seq = 12*2048 * SRSRAN_LTE_TS * 0.5;
+      p->T_tot = (12*2048 + 936) * SRSRAN_LTE_TS * 0.5;
+    } else {
+      p->N_seq = prach_Tseq[p->f] * p->N_ifft_ul / 2048;
+      p->N_cp  = prach_Tcp[p->f] * p->N_ifft_ul / 2048;
+      p->T_seq = prach_Tseq[p->f] * SRSRAN_LTE_TS;
+      p->T_tot = (prach_Tseq[p->f] + prach_Tcp[p->f]) * SRSRAN_LTE_TS;
+    }
+    
 
     if (p->successive_cancellation) {
       for (int i = 0; i < 64; i++) {
