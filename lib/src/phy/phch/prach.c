@@ -623,7 +623,7 @@ int srsran_prach_set_cell_(srsran_prach_t*      p,
                            srsran_tdd_config_t* tdd_config)
 {
   int ret = SRSRAN_ERROR;
-  if (p != NULL && N_ifft_ul < 2049 && cfg->config_idx < 64 && cfg->root_seq_idx < MAX_ROOTS) {
+  if (p != NULL && N_ifft_ul < 2049 && (cfg->config_idx < 64 || cfg->config_idx == 160) && cfg->root_seq_idx < MAX_ROOTS) {
     if (N_ifft_ul > p->max_N_ifft_ul) {
       ERROR("PRACH: Error in set_cell(): N_ifft_ul (%d) must be lower or equal max_N_ifft_ul (%d) in init()",
             N_ifft_ul,
@@ -662,6 +662,14 @@ int srsran_prach_set_cell_(srsran_prach_t*      p,
         ERROR("Invalid zeroCorrelationZoneConfig=%d for format4", p->zczc);
         return SRSRAN_ERROR;
       }
+    } else if (p->is_nr && preamble_format == 10) {
+      if (p->zczc < 16) {
+        p->N_zc = SRSRAN_PRACH_N_ZC_SHORT;
+        p->N_cs = prach_Ncs_format_nr_short[p->zczc];
+      } else {
+        ERROR("Invalid zeroCorrelationZoneConfig=%d for short PRACH in NR", p->zczc);
+        return SRSRAN_ERROR;
+      }
     } else {
       p->N_zc = SRSRAN_PRACH_N_ZC_LONG;
       if (p->hs) {
@@ -694,6 +702,7 @@ int srsran_prach_set_cell_(srsran_prach_t*      p,
     // Generate our 64 sequences
     p->N_roots = 0;
     srsran_prach_gen_seqs(p);
+    printf("Using %d root sequences in this configuration\n");
     // Ensure num_ra_preambles is valid, if not assign default value
     if (p->num_ra_preambles < 4 || p->num_ra_preambles > p->N_roots) {
       p->num_ra_preambles = p->N_roots;

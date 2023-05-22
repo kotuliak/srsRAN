@@ -40,6 +40,9 @@ uint32_t prach_Ncs_restricted[15] = {15, 18, 22, 26, 32, 38, 46, 55, 68, 82, 100
 // Table 5.7.2-3 - N_cs values for preamble format 4
 uint32_t prach_Ncs_format4[7] = {2, 4, 6, 8, 10, 12, 15};
 
+// Table 6.3.3.1-7 - N_cs values for short sequences in NR
+uint32_t prach_Ncs_format_nr_short[16] = {0, 2, 4, 6, 8, 10, 12, 13, 15, 17, 19, 23, 27, 34, 46, 69};
+
 // Table 5.7.2-4 - Root ZC sequence order
 uint32_t prach_zc_roots[838] = {
     129, 710, 140, 699, 120, 719, 210, 629, 168, 671, 84,  755, 105, 734, 93,  746, 70,  769, 60,  779, 2,   837, 1,
