@@ -79,8 +79,8 @@ typedef struct SRSRAN_API {
   float    T_seq; // Preamble length in seconds
   float    T_tot; // Total sequence length in seconds
   uint32_t N_cp;  // Cyclic prefix length
-  uint32_t delta_f = 15000;
-  uint32_t delta_f_ra = 1250;
+  uint32_t delta_f;
+  uint32_t delta_f_ra;
 
   // Generated tables
   cf_t     seqs[64][SRSRAN_PRACH_N_ZC_LONG];     // Our set of 64 preamble sequences
@@ -159,6 +159,8 @@ typedef struct {
   srsran_tdd_config_t tdd_config;
   bool                enable_successive_cancellation;
   bool                enable_freq_domain_offset_calc;
+  uint32_t            delta_f;
+  uint32_t            delta_f_ra;
 } srsran_prach_cfg_t;
 
 typedef struct SRSRAN_API {

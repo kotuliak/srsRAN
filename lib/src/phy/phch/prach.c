@@ -559,6 +559,9 @@ int srsran_prach_init(srsran_prach_t* p, uint32_t max_N_ifft_ul)
   if (p != NULL && max_N_ifft_ul < 2049) {
     bzero(p, sizeof(srsran_prach_t));
 
+    p->delta_f = 15000;
+    p->delta_f_ra = 1250;
+
     p->max_N_ifft_ul = max_N_ifft_ul;
 
     // Set up containers
@@ -638,6 +641,8 @@ int srsran_prach_set_cell_(srsran_prach_t*      p,
     p->detect_factor           = PRACH_DETECT_FACTOR;
     p->num_ra_preambles        = cfg->num_ra_preambles;
     p->successive_cancellation = cfg->enable_successive_cancellation;
+    p->delta_f                 = cfg->delta_f;
+    p->delta_f_ra              = cfg->delta_f_ra;
     p->dft_gen_bitmap          = 0;
     if (p->successive_cancellation && cfg->zero_corr_zone != 0) {
       printf("successive cancellation only currently supported with zero_correlation_zone_config of 0 - disabling\n");
