@@ -79,6 +79,8 @@ typedef struct SRSRAN_API {
   float    T_seq; // Preamble length in seconds
   float    T_tot; // Total sequence length in seconds
   uint32_t N_cp;  // Cyclic prefix length
+  uint32_t delta_f = 15000;
+  uint32_t delta_f_ra = 1250;
 
   // Generated tables
   cf_t     seqs[64][SRSRAN_PRACH_N_ZC_LONG];     // Our set of 64 preamble sequences

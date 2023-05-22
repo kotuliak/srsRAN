@@ -36,8 +36,6 @@
 #define SUCCESSIVE_CANCELLATION_ITS 4
 #define N_SEQS 64         // Number of prach sequences available
 #define N_RB_SC 12        // Number of subcarriers per resource block
-#define DELTA_F 15000     // Normal subcarrier spacing
-#define DELTA_F_RA 1250   // PRACH subcarrier spacing
 #define DELTA_F_RA_4 7500 // PRACH subcarrier spacing for format 4
 #define PHI 7             // PRACH phi parameter
 #define PHI_4 2           // PRACH phi parameter for format 4
@@ -583,7 +581,7 @@ int srsran_prach_init(srsran_prach_t* p, uint32_t max_N_ifft_ul)
     srsran_dft_plan_set_mirror(&p->zc_ifft, false);
     srsran_dft_plan_set_norm(&p->zc_ifft, false);
 
-    uint32_t fft_size_alloc = max_N_ifft_ul * DELTA_F / DELTA_F_RA;
+    uint32_t fft_size_alloc = max_N_ifft_ul * p->delta_f / p->delta_f_ra;
 
     p->ifft_in  = srsran_vec_cf_malloc(fft_size_alloc);
     p->ifft_out = srsran_vec_cf_malloc(fft_size_alloc);
@@ -699,9 +697,9 @@ int srsran_prach_set_cell_(srsran_prach_t*      p,
     // Create our FFT objects and buffers
     p->N_ifft_ul = N_ifft_ul;
     if (4 == preamble_format) {
-      p->N_ifft_prach = p->N_ifft_ul * DELTA_F / DELTA_F_RA_4;
+      p->N_ifft_prach = p->N_ifft_ul * p->delta_f / DELTA_F_RA_4;
     } else {
-      p->N_ifft_prach = p->N_ifft_ul * DELTA_F / DELTA_F_RA;
+      p->N_ifft_prach = p->N_ifft_ul * p->delta_f / p->delta_f_ra;
     }
 
     /* The deadzone specifies the number of samples at the end of the correlation window
@@ -753,7 +751,7 @@ int srsran_prach_gen(srsran_prach_t* p, uint32_t seq_index, uint32_t freq_offset
     // Calculate parameters
     uint32_t N_rb_ul = srsran_nof_prb(p->N_ifft_ul);
     uint32_t k_0     = freq_offset * N_RB_SC - N_rb_ul * N_RB_SC / 2 + p->N_ifft_ul / 2;
-    uint32_t K       = DELTA_F / DELTA_F_RA;
+    uint32_t K       = p->delta_f / p->delta_f_ra;
     uint32_t begin   = PHI + (K * k_0) + (p->is_nr ? 0 : (K / 2));
 
     if (6 + freq_offset > N_rb_ul) {
@@ -840,7 +838,7 @@ bool srsran_prach_have_stored(int current_idx, uint32_t* indices, uint32_t n_ind
 float srsran_prach_get_offset_secs(srsran_prach_t* p, int n_win)
 {
   // takes the offset in samples and converts to time in seconds
-  return (float)p->peak_offsets[n_win] / (float)(DELTA_F_RA * p->N_zc);
+  return (float)p->peak_offsets[n_win] / (float)(p->delta_f_ra * p->N_zc);
 }
 
 // calculates the timing offset of the incoming PRACH by calculating the phase in frequency - alternative to time domain
@@ -849,12 +847,12 @@ float srsran_prach_calculate_time_offset_secs(srsran_prach_t* p, cf_t* cross)
 {
   // calculate the phase of the cross correlation
   float freq_domain_phase = cargf(srsran_vec_acc_cc(cross, p->N_zc));
-  float ratio             = (float)(p->N_ifft_ul * DELTA_F) / (float)(SRSRAN_PRACH_N_ZC_LONG * DELTA_F_RA);
+  float ratio             = (float)(p->N_ifft_ul * p->delta_f) / (float)(SRSRAN_PRACH_N_ZC_LONG * p->delta_f_ra);
   // converting from phase to number of samples
   float num_samples = roundf((ratio * freq_domain_phase * p->N_zc) / (2 * M_PI));
 
   // converting to time in seconds
-  return num_samples / ((float)p->N_ifft_ul * DELTA_F);
+  return num_samples / ((float)p->N_ifft_ul * p->delta_f);
 }
 // calculates the aggregate phase offset of the incomming PRACH signal so it can be applied to the reference signal
 // before it is subtracted from the input
@@ -992,7 +990,7 @@ int srsran_prach_detect_offset(srsran_prach_t* p,
     // Extract bins of interest
     uint32_t N_rb_ul = srsran_nof_prb(p->N_ifft_ul);
     uint32_t k_0     = freq_offset * N_RB_SC - N_rb_ul * N_RB_SC / 2 + p->N_ifft_ul / 2;
-    uint32_t K       = DELTA_F / DELTA_F_RA;
+    uint32_t K       = p->delta_f / p->delta_f_ra;
     uint32_t begin   = PHI + (K * k_0) + (p->is_nr ? 0 : (K / 2));
 
     memcpy(p->prach_bins, &p->signal_fft[begin], p->N_zc * sizeof(cf_t));
