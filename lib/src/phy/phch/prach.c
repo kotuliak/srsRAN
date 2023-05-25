@@ -465,6 +465,8 @@ int srsran_prach_gen_seqs(srsran_prach_t* p)
       // Get a new root sequence
       if (4 == p->f) {
         u = prach_zc_roots_format4[(p->rsi + p->N_roots) % 138];
+      } else if (p->is_nr) {
+        u = prach_zc_roots_format4[(p->rsi + p->N_roots) % 138];
       } else {
         u = prach_zc_roots[(p->rsi + p->N_roots) % 838];
       }
@@ -643,6 +645,7 @@ int srsran_prach_set_cell_(srsran_prach_t*      p,
     p->successive_cancellation = cfg->enable_successive_cancellation;
     p->delta_f                 = cfg->delta_f;
     p->delta_f_ra              = cfg->delta_f_ra;
+    p->nof_prb                 = cfg->nof_prb;
     p->dft_gen_bitmap          = 0;
     if (p->successive_cancellation && cfg->zero_corr_zone != 0) {
       printf("successive cancellation only currently supported with zero_correlation_zone_config of 0 - disabling\n");
@@ -666,6 +669,7 @@ int srsran_prach_set_cell_(srsran_prach_t*      p,
       if (p->zczc < 16) {
         p->N_zc = SRSRAN_PRACH_N_ZC_SHORT;
         p->N_cs = prach_Ncs_format_nr_short[p->zczc];
+        printf("setting up generation of nr praches");
       } else {
         ERROR("Invalid zeroCorrelationZoneConfig=%d for short PRACH in NR", p->zczc);
         return SRSRAN_ERROR;
@@ -773,10 +777,15 @@ int srsran_prach_gen(srsran_prach_t* p, uint32_t seq_index, uint32_t freq_offset
   int ret = SRSRAN_ERROR;
   if (p != NULL && seq_index < N_SEQS && signal != NULL) {
     // Calculate parameters
-    uint32_t N_rb_ul = srsran_nof_prb(p->N_ifft_ul);
+    uint32_t N_rb_ul = p->nof_prb;
     uint32_t k_0     = freq_offset * N_RB_SC - N_rb_ul * N_RB_SC / 2 + p->N_ifft_ul / 2;
     uint32_t K       = p->delta_f / p->delta_f_ra;
-    uint32_t begin   = PHI + (K * k_0) + (p->is_nr ? 0 : (K / 2));
+    uint32_t begin;
+    if (p->is_nr) {
+      begin = 2 + (K * k_0);
+    } else {
+      begin = PHI + (K * k_0) + (K / 2);
+    }
 
     if (6 + freq_offset > N_rb_ul) {
       ERROR("Error no space for PRACH: frequency offset=%d, N_rb_ul=%d", freq_offset, N_rb_ul);
@@ -1012,7 +1021,7 @@ int srsran_prach_detect_offset(srsran_prach_t* p,
     *n_indices = 0;
 
     // Extract bins of interest
-    uint32_t N_rb_ul = srsran_nof_prb(p->N_ifft_ul);
+    uint32_t N_rb_ul = p->nof_prb;
     uint32_t k_0     = freq_offset * N_RB_SC - N_rb_ul * N_RB_SC / 2 + p->N_ifft_ul / 2;
     uint32_t K       = p->delta_f / p->delta_f_ra;
     uint32_t begin;

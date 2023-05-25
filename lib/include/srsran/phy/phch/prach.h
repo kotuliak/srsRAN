@@ -62,6 +62,7 @@ typedef struct {
 typedef struct SRSRAN_API {
   // Parameters from higher layers (extracted from SIB2)
   bool     is_nr;
+  uint32_t nof_prb;
   uint32_t config_idx;
   uint32_t f;            // preamble format
   uint32_t rsi;          // rootSequenceIndex
@@ -151,6 +152,7 @@ typedef enum SRSRAN_API {
 
 typedef struct {
   bool                is_nr; // Set to true if NR
+  uint32_t            nof_prb;
   uint32_t            config_idx;
   uint32_t            root_seq_idx;
   uint32_t            zero_corr_zone;
