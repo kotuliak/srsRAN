@@ -413,6 +413,8 @@ int srsran_carrier_to_cell(const srsran_carrier_nr_t* carrier, srsran_cell_t* ce
     cell->nof_prb = 75;
   } else if (carrier->nof_prb <= 106) {
     cell->nof_prb = 100;
+  } else if (carrier->nof_prb <= 306) {
+    cell->nof_prb = 273;
   } else {
     return SRSRAN_ERROR_OUT_OF_BOUNDS;
   }

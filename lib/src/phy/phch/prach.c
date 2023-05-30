@@ -558,7 +558,7 @@ int srsran_prach_set_cfg(srsran_prach_t* p, srsran_prach_cfg_t* cfg, uint32_t no
 int srsran_prach_init(srsran_prach_t* p, uint32_t max_N_ifft_ul)
 {
   int ret = SRSRAN_ERROR;
-  if (p != NULL && max_N_ifft_ul < 2049) {
+  if (p != NULL && max_N_ifft_ul < 6145) {
     bzero(p, sizeof(srsran_prach_t));
 
     p->delta_f = 15000;
@@ -625,7 +625,7 @@ int srsran_prach_set_cell_(srsran_prach_t*      p,
                            srsran_tdd_config_t* tdd_config)
 {
   int ret = SRSRAN_ERROR;
-  if (p != NULL && N_ifft_ul < 2049 && (cfg->config_idx < 64 || cfg->config_idx == 160) && cfg->root_seq_idx < MAX_ROOTS) {
+  if (p != NULL && N_ifft_ul < 6145 && (cfg->config_idx < 64 || cfg->config_idx == 159 || cfg->config_idx == 160) && cfg->root_seq_idx < MAX_ROOTS) {
     if (N_ifft_ul > p->max_N_ifft_ul) {
       ERROR("PRACH: Error in set_cell(): N_ifft_ul (%d) must be lower or equal max_N_ifft_ul (%d) in init()",
             N_ifft_ul,
@@ -665,7 +665,7 @@ int srsran_prach_set_cell_(srsran_prach_t*      p,
         ERROR("Invalid zeroCorrelationZoneConfig=%d for format4", p->zczc);
         return SRSRAN_ERROR;
       }
-    } else if (p->is_nr && preamble_format == 10) {
+    } else if (p->is_nr) {
       if (p->zczc < 16) {
         p->N_zc = SRSRAN_PRACH_N_ZC_SHORT;
         p->N_cs = prach_Ncs_format_nr_short[p->zczc];
