@@ -225,6 +225,8 @@ SRSRAN_API int srsran_prach_set_cfg(srsran_prach_t* p, srsran_prach_cfg_t* cfg, 
 
 SRSRAN_API int srsran_prach_gen(srsran_prach_t* p, uint32_t seq_index, uint32_t freq_offset, cf_t* signal);
 
+SRSRAN_API cf_t* srsran_get_precoded_dft(srsran_prach_t* p, uint32_t idx);
+
 SRSRAN_API int srsran_prach_detect(srsran_prach_t* p,
                                    uint32_t        freq_offset,
                                    cf_t*           signal,

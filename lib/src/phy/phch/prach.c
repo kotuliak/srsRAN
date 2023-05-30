@@ -432,7 +432,7 @@ void print(void* d, uint32_t size, uint32_t len, char* file_str)
 }
 
 /// Calculates the FFT of the specified sequence index if not previously done and returns a pointer to the result.
-static cf_t* get_precoded_dft(srsran_prach_t* p, uint32_t idx)
+cf_t* srsran_get_precoded_dft(srsran_prach_t* p, uint32_t idx)
 {
   assert(idx < 64 && "Invalid idx value");
   // Generate FFT for this sequence if it does not exist yet.
@@ -799,7 +799,7 @@ int srsran_prach_gen(srsran_prach_t* p, uint32_t seq_index, uint32_t freq_offset
     srsran_vec_cf_zero(p->ifft_in, begin);
 
     // Map dft-precoded sequence to ifft bins
-    srsran_vec_cf_copy(&p->ifft_in[begin], get_precoded_dft(p, seq_index), p->N_zc);
+    srsran_vec_cf_copy(&p->ifft_in[begin], srsran_get_precoded_dft(p, seq_index), p->N_zc);
 
     // Fill top guard frequency domain with zeros
     srsran_vec_cf_zero(&p->ifft_in[begin + p->N_zc], p->N_ifft_prach - begin - p->N_zc);
@@ -843,7 +843,7 @@ int srsran_prach_detect(srsran_prach_t* p,
 void srsran_prach_cancellation(srsran_prach_t* p)
 {
   srsran_vec_cf_zero(p->sub, p->N_zc * 2);
-  srsran_vec_cf_copy(p->sub, get_precoded_dft(p, p->root_seqs_idx[p->prach_cancel.idx]), p->N_zc);
+  srsran_vec_cf_copy(p->sub, srsran_get_precoded_dft(p, p->root_seqs_idx[p->prach_cancel.idx]), p->N_zc);
 
   srsran_vec_prod_ccc(p->sub, p->prach_cancel.phase_array, p->sub, p->N_zc);
 #ifdef PRACH_CANCELLATION_HARD
@@ -914,7 +914,7 @@ int srsran_prach_process(srsran_prach_t* p,
   srsran_vec_cf_zero(p->cross, p->N_zc);
   srsran_vec_cf_zero(p->corr_freq, p->N_zc);
   for (int i = 0; i < p->num_ra_preambles; i++) {
-    cf_t* root_spec = get_precoded_dft(p, p->root_seqs_idx[i]);
+    cf_t* root_spec = srsran_get_precoded_dft(p, p->root_seqs_idx[i]);
 
     srsran_vec_prod_conj_ccc(p->prach_bins, root_spec, p->corr_spec, p->N_zc);
 
